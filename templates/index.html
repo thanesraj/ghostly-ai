@@ -48,34 +48,51 @@
 
   <div class="response" id="ghost-reply">{{ response }}</div>
 
-  <!-- 🔊 New Creepy Background Music -->
+  <!-- 🔊 Haunted Background Music -->
   <audio autoplay loop id="bg-music">
-    <source src="https://cdn.pixabay.com/download/audio/2023/03/22/audio_d66d9e5b50.mp3?filename=horror-background-143107.mp3" type="audio/mpeg">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3e7d154c69.mp3?filename=haunted-background-110046.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- 👻 Whisper Sound FX -->
+  <!-- 👻 Whisper FX -->
   <audio id="whisper-sound">
     <source src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_d92cc1d83c.mp3?filename=whispers-145471.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    const reply = document.getElementById("ghost-reply").innerText;
-    const whisper = document.getElementById("whisper-sound");
+    window.addEventListener('load', () => {
+      const reply = document.getElementById("ghost-reply").innerText.trim();
+      const whisper = document.getElementById("whisper-sound");
 
-    if (reply && reply.length > 0 && reply !== "None") {
-      // Whisper effect
-      whisper.play();
+      if (reply && reply.toLowerCase() !== "none") {
+        // Play whisper sound
+        whisper.play();
 
-      // Creepy AI voice
-      const utterance = new SpeechSynthesisUtterance(reply);
-      utterance.pitch = 0.2;
-      utterance.rate = 0.75;
-      utterance.volume = 1;
-      utterance.voice = speechSynthesis.getVoices().find(v =>
-        v.name.toLowerCase().includes("zira") || v.lang === "en-US"
-      );
-      speechSynthesis.speak(utterance);
-    }
+        // Speak response in creepy voice
+        const speak = () => {
+          const utterance = new SpeechSynthesisUtterance(reply);
+          utterance.pitch = 0.2;
+          utterance.rate = 0.75;
+          utterance.volume = 1;
+
+          const voices = speechSynthesis.getVoices();
+          utterance.voice = voices.find(v =>
+            v.name.toLowerCase().includes("zira") ||
+            v.name.toLowerCase().includes("whisper") ||
+            v.lang === "en-US"
+          ) || voices[0];
+
+          speechSynthesis.speak(utterance);
+        };
+
+        // Delay a bit to allow voices to load
+        if (speechSynthesis.getVoices().length === 0) {
+          speechSynthesis.onvoiceschanged = speak;
+        } else {
+          speak();
+        }
+      }
+    });
   </script>
 </body>
 </html>
+
