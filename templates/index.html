@@ -11,9 +11,10 @@
       font-family: 'Creepster', cursive;
       text-align: center;
       padding: 50px;
-      background-image: url('https://i.ibb.co/V3FTLwM/bg-dark.jpg');
+      background-image: url('https://images.unsplash.com/photo-1601987077220-18c7dd3a3c1f?auto=format&fit=crop&w=1950&q=80');
       background-size: cover;
       background-position: center;
+      background-repeat: no-repeat;
     }
 
     input, button {
@@ -47,12 +48,12 @@
 
   <div class="response" id="ghost-reply">{{ response }}</div>
 
-  <!-- Background Music -->
+  <!-- 🔊 New Creepy Background Music -->
   <audio autoplay loop id="bg-music">
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+    <source src="https://cdn.pixabay.com/download/audio/2023/03/22/audio_d66d9e5b50.mp3?filename=horror-background-143107.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Whisper FX (Triggered on reply) -->
+  <!-- 👻 Whisper Sound FX -->
   <audio id="whisper-sound">
     <source src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_d92cc1d83c.mp3?filename=whispers-145471.mp3" type="audio/mpeg">
   </audio>
@@ -62,15 +63,17 @@
     const whisper = document.getElementById("whisper-sound");
 
     if (reply && reply.length > 0 && reply !== "None") {
-      // Play whisper sound
+      // Whisper effect
       whisper.play();
 
-      // Creepy TTS voice
+      // Creepy AI voice
       const utterance = new SpeechSynthesisUtterance(reply);
-      utterance.pitch = 0.2; // Very deep
-      utterance.rate = 0.75; // Slow
+      utterance.pitch = 0.2;
+      utterance.rate = 0.75;
       utterance.volume = 1;
-      utterance.voice = speechSynthesis.getVoices().find(v => v.name.toLowerCase().includes("zira") || v.name.toLowerCase().includes("whisper") || v.lang === 'en-US');
+      utterance.voice = speechSynthesis.getVoices().find(v =>
+        v.name.toLowerCase().includes("zira") || v.lang === "en-US"
+      );
       speechSynthesis.speak(utterance);
     }
   </script>
