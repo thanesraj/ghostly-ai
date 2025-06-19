@@ -49,7 +49,7 @@
   <div class="response" id="ghost-reply">{{ response }}</div>
 
   <!-- 🔊 Haunted Background Music -->
-  <audio autoplay loop id="bg-music">
+  <audio id="bg-music" autoplay loop muted>
     <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3e7d154c69.mp3?filename=haunted-background-110046.mp3" type="audio/mpeg">
   </audio>
 
@@ -60,14 +60,19 @@
 
   <script>
     window.addEventListener('load', () => {
+      // Unmute background music after user interacts (browser autoplay policy)
+      const bgMusic = document.getElementById("bg-music");
+      document.body.addEventListener('click', () => {
+        bgMusic.muted = false;
+        bgMusic.play();
+      });
+
       const reply = document.getElementById("ghost-reply").innerText.trim();
       const whisper = document.getElementById("whisper-sound");
 
       if (reply && reply.toLowerCase() !== "none") {
-        // Play whisper sound
         whisper.play();
 
-        // Speak response in creepy voice
         const speak = () => {
           const utterance = new SpeechSynthesisUtterance(reply);
           utterance.pitch = 0.2;
@@ -84,7 +89,6 @@
           speechSynthesis.speak(utterance);
         };
 
-        // Delay a bit to allow voices to load
         if (speechSynthesis.getVoices().length === 0) {
           speechSynthesis.onvoiceschanged = speak;
         } else {
