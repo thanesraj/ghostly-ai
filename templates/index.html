@@ -3,33 +3,76 @@
 <head>
   <title>Ghost Chat</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
+
     body {
       background-color: black;
-      color: white;
-      font-family: 'Courier New', monospace;
+      color: crimson;
+      font-family: 'Creepster', cursive;
       text-align: center;
       padding: 50px;
+      background-image: url('https://i.ibb.co/V3FTLwM/bg-dark.jpg');
+      background-size: cover;
+      background-position: center;
     }
+
     input, button {
       padding: 10px;
-      font-size: 16px;
+      font-size: 18px;
       background: #111;
       color: white;
       border: 1px solid red;
+      margin-top: 10px;
     }
+
     .response {
       margin-top: 30px;
-      font-size: 18px;
-      color: crimson;
+      font-size: 22px;
+      animation: flicker 1.5s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
   </style>
 </head>
 <body>
-  <h1>👻 Ghost Chat</h1>
+  <h1>👁️ Ghost Chat 👁️</h1>
   <form method="POST">
-    <input type="text" name="prompt" placeholder="Ask your ghost..." required />
+    <input type="text" name="prompt" placeholder="Speak to the ghost..." required />
+    <br><br>
     <button type="submit">Summon</button>
   </form>
-  <div class="response">{{ response }}</div>
+
+  <div class="response" id="ghost-reply">{{ response }}</div>
+
+  <!-- Background Music -->
+  <audio autoplay loop id="bg-music">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Whisper FX (Triggered on reply) -->
+  <audio id="whisper-sound">
+    <source src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_d92cc1d83c.mp3?filename=whispers-145471.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const reply = document.getElementById("ghost-reply").innerText;
+    const whisper = document.getElementById("whisper-sound");
+
+    if (reply && reply.length > 0 && reply !== "None") {
+      // Play whisper sound
+      whisper.play();
+
+      // Creepy TTS voice
+      const utterance = new SpeechSynthesisUtterance(reply);
+      utterance.pitch = 0.2; // Very deep
+      utterance.rate = 0.75; // Slow
+      utterance.volume = 1;
+      utterance.voice = speechSynthesis.getVoices().find(v => v.name.toLowerCase().includes("zira") || v.name.toLowerCase().includes("whisper") || v.lang === 'en-US');
+      speechSynthesis.speak(utterance);
+    }
+  </script>
 </body>
 </html>
