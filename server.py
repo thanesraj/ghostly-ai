@@ -14,14 +14,20 @@ def index():
             "Content-Type": "application/json"
         }
         data = {
-            "model": "openchat/openchat-3.5-1210",
+            "model": "mistralai/mistral-7b-instruct",
             "messages": [
-                {"role": "system", "content": "You are a creepy ghost that whispers scary things."},
+                {"role": "system", "content": "You are a creepy ghost that whispers in fear."},
                 {"role": "user", "content": prompt}
             ]
         }
-        r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-        response = r.json().get("choices", [{}])[0].get("message", {}).get("content", "No response.")
+        try:
+            r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+            if r.status_code == 200:
+                response = r.json().get("choices", [{}])[0].get("message", {}).get("content", "Ghost didn’t speak.")
+            else:
+                response = f"Error {r.status_code}: Ghost refused to answer."
+        except Exception as e:
+            response = f"Exception: {str(e)}"
 
     return render_template("index.html", response=response)
 
