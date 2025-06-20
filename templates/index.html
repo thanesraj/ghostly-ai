@@ -1,34 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Ghost Chat</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
 
     body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Creepster', cursive;
       background-color: black;
       color: crimson;
-      font-family: 'Creepster', cursive;
-      text-align: center;
-      padding: 50px;
       background-image: url('https://images.unsplash.com/photo-1601987077220-18c7dd3a3c1f?auto=format&fit=crop&w=1950&q=80');
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
+      text-align: center;
     }
 
-    input, button {
+    h1 {
+      margin-top: 50px;
+      font-size: 48px;
+    }
+
+    form {
+      margin-top: 30px;
+    }
+
+    input[type="text"] {
       padding: 10px;
+      width: 300px;
       font-size: 18px;
       background: #111;
-      color: white;
       border: 1px solid red;
+      color: white;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
       margin-top: 10px;
+      background-color: crimson;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
 
     .response {
-      margin-top: 30px;
-      font-size: 22px;
+      margin-top: 40px;
+      font-size: 24px;
+      color: #fff;
       animation: flicker 1.5s infinite;
     }
 
@@ -39,50 +60,52 @@
   </style>
 </head>
 <body>
-  <h1>👁️ Ghost Chat 👁️</h1>
+
+  <h1>👻 Summon the Ghost</h1>
+
   <form method="POST">
-    <input type="text" name="prompt" placeholder="Speak to the ghost..." required />
-    <br><br>
+    <input type="text" name="prompt" placeholder="Ask the ghost something..." required />
+    <br>
     <button type="submit">Summon</button>
   </form>
 
   <div class="response" id="ghost-reply">{{ response }}</div>
 
-  <!-- 🔊 Haunted Background Music -->
+  <!-- Background Music -->
   <audio id="bg-music" autoplay loop muted>
     <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3e7d154c69.mp3?filename=haunted-background-110046.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- 👻 Whisper FX -->
+  <!-- Whisper Sound -->
   <audio id="whisper-sound">
     <source src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_d92cc1d83c.mp3?filename=whispers-145471.mp3" type="audio/mpeg">
   </audio>
 
   <script>
     window.addEventListener('load', () => {
-      // Unmute background music after user interacts (browser autoplay policy)
       const bgMusic = document.getElementById("bg-music");
+      const whisper = document.getElementById("whisper-sound");
+      const reply = document.getElementById("ghost-reply").innerText.trim();
+
+      // Enable music after first click due to autoplay restrictions
       document.body.addEventListener('click', () => {
         bgMusic.muted = false;
         bgMusic.play();
       });
-
-      const reply = document.getElementById("ghost-reply").innerText.trim();
-      const whisper = document.getElementById("whisper-sound");
 
       if (reply && reply.toLowerCase() !== "none") {
         whisper.play();
 
         const speak = () => {
           const utterance = new SpeechSynthesisUtterance(reply);
-          utterance.pitch = 0.2;
-          utterance.rate = 0.75;
+          utterance.pitch = 0.1;      // Low = creepy
+          utterance.rate = 0.6;       // Slow = eerie
           utterance.volume = 1;
 
           const voices = speechSynthesis.getVoices();
           utterance.voice = voices.find(v =>
             v.name.toLowerCase().includes("zira") ||
-            v.name.toLowerCase().includes("whisper") ||
+            v.name.toLowerCase().includes("microsoft") ||
             v.lang === "en-US"
           ) || voices[0];
 
@@ -99,4 +122,3 @@
   </script>
 </body>
 </html>
-
