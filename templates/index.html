@@ -2,127 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Ghost Chat</title>
+  <title>Ghostly AI</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
-
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Creepster', cursive;
-      background-color: black;
-      color: crimson;
-      background-image: url('https://images.unsplash.com/photo-1601987077220-18c7dd3a3c1f?auto=format&fit=crop&w=1950&q=80');
+      background-image: url("/static/ghost-bg.jpg");
       background-size: cover;
       background-position: center;
+      color: white;
+      font-family: 'Courier New', Courier, monospace;
       text-align: center;
+      padding-top: 50px;
     }
 
-    h1 {
-      margin-top: 50px;
-      font-size: 48px;
-    }
-
-    form {
-      margin-top: 30px;
+    .chat-box {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 15px;
     }
 
     input[type="text"] {
       padding: 10px;
-      width: 300px;
-      font-size: 18px;
-      background: #111;
-      border: 1px solid red;
-      color: white;
+      width: 80%;
+      border: none;
+      border-radius: 10px;
     }
 
     button {
       padding: 10px 20px;
-      font-size: 18px;
-      margin-top: 10px;
       background-color: crimson;
-      color: white;
       border: none;
+      color: white;
+      border-radius: 10px;
       cursor: pointer;
     }
 
-    .response {
-      margin-top: 40px;
-      font-size: 24px;
-      color: #fff;
-      animation: flicker 1.5s infinite;
+    audio {
+      display: none;
     }
 
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+    #ghost-reply {
+      margin-top: 20px;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
+  <div class="chat-box">
+    <h1>👻 Ghostly AI</h1>
+    <input type="text" id="userInput" placeholder="Ask the ghost something creepy...">
+    <button onclick="askGhost()">Summon</button>
+    <div id="ghost-reply"></div>
+  </div>
 
-  <h1>👻 Summon the Ghost</h1>
-
-  <form method="POST">
-    <input type="text" name="prompt" placeholder="Ask the ghost something..." required />
-    <br>
-    <button type="submit">Summon</button>
-  </form>
-
-  <div class="response" id="ghost-reply">{{ response }}</div>
-
-  <!-- Background Music -->
-  <audio id="bg-music" autoplay loop muted>
-    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3e7d154c69.mp3?filename=haunted-background-110046.mp3" type="audio/mpeg">
+  <!-- Background ambience -->
+  <audio id="bg-ambience" loop autoplay>
+    <source src="/static/sfx/ghost-ambience.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Whisper Sound -->
+  <!-- Creepy sound effects -->
   <audio id="whisper-sound">
-    <source src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_d92cc1d83c.mp3?filename=whispers-145471.mp3" type="audio/mpeg">
+    <source src="/static/sfx/whisper.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="giggle-sound">
+    <source src="/static/sfx/giggle.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="chuckle-sound">
+    <source src="/static/sfx/chuckle.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    window.addEventListener('load', () => {
-      const bgMusic = document.getElementById("bg-music");
-      const whisper = document.getElementById("whisper-sound");
-      const reply = document.getElementById("ghost-reply").innerText.trim();
+    function playSoundEffect(type) {
+      const sounds = {
+        "*whispers*": document.getElementById("whisper-sound"),
+        "*giggles*": document.getElementById("giggle-sound"),
+        "*chuckles*": document.getElementById("chuckle-sound")
+      };
 
-      // Enable music after first click due to autoplay restrictions
-      document.body.addEventListener('click', () => {
-        bgMusic.muted = false;
-        bgMusic.play();
-      });
-
-      if (reply && reply.toLowerCase() !== "none") {
-        whisper.play();
-
-        const speak = () => {
-          const utterance = new SpeechSynthesisUtterance(reply);
-          utterance.pitch = 0.1;      // Low = creepy
-          utterance.rate = 0.6;       // Slow = eerie
-          utterance.volume = 1;
-
-          const voices = speechSynthesis.getVoices();
-          utterance.voice = voices.find(v =>
-            v.name.toLowerCase().includes("zira") ||
-            v.name.toLowerCase().includes("microsoft") ||
-            v.lang === "en-US"
-          ) || voices[0];
-
-          speechSynthesis.speak(utterance);
-        };
-
-        if (speechSynthesis.getVoices().length === 0) {
-          speechSynthesis.onvoiceschanged = speak;
-        } else {
-          speak();
+      Object.keys(sounds).forEach(keyword => {
+        if (type.includes(keyword)) {
+          sounds[keyword].play();
         }
+      });
+    }
+
+    async function askGhost() {
+      const input = document.getElementById("userInput").value;
+      const responseDiv = document.getElementById("ghost-reply");
+      responseDiv.innerText = "Summoning ghost... 👻";
+
+      try {
+        const response = await fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `prompt=${encodeURIComponent(input)}`
+        });
+
+        const data = await response.text();
+        responseDiv.innerText = data;
+
+        playSoundEffect(data.toLowerCase());
+
+      } catch (error) {
+        responseDiv.innerText = "👻 The ghost has vanished... Try again later.";
+        console.error(error);
       }
-    });
+    }
+
+    // Auto-play ambience when page loads
+    window.onload = () => {
+      const bg = document.getElementById("bg-ambience");
+      bg.volume = 0.3;
+      bg.play();
+    };
   </script>
 </body>
 </html>
-<audio autoplay loop>
-  <source src="{{ url_for('static', filename='ghost-ambience.mp3') }}" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
