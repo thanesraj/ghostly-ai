@@ -17,6 +17,9 @@ def index():
         prompt = request.form.get("prompt")
 
         try:
+            if not OPENROUTER_API_KEY:
+                return "👻 API key missing. Check your .env file."
+
             headers = {
                 "Authorization": f"Bearer {OPENROUTER_API_KEY}",
                 "Content-Type": "application/json"
@@ -31,14 +34,20 @@ def index():
             }
 
             response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
-            result = response.json()
-            reply = result["choices"][0]["message"]["content"]
+            print("RESPONSE STATUS:", response.status_code)
+            print("RESPONSE BODY:", response.text)
 
-            return reply
+            if response.status_code == 200:
+                result = response.json()
+                reply = result["choices"][0]["message"]["content"]
+                return reply
+            else:
+                return f"👻 Error from API: {response.status_code} – {response.text}"
 
         except Exception as e:
-            print("Error:", e)
-            return "👻 The ghost encountered an error."
+            import traceback
+            traceback.print_exc()
+            return f"👻 Server Error: {str(e)}"
 
     return render_template("index.html")
 
